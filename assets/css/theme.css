@@ -1,0 +1,170 @@
+@charset "UTF-8";
+textarea:focus,
+input:focus {
+  outline: 0; }
+
+/* Question */
+.formGroup {
+  margin-bottom: 25px; }
+
+input.question,
+textarea.question {
+  font-size: 17px;
+  font-weight: 300;
+  border-radius: 2px;
+  margin: 0;
+  padding-right: 0;
+  padding-left: 0;
+  border: none;
+  width: 100%;
+  background: transparent;
+  transition: padding-top 0.2s ease, margin-top 0.2s ease;
+  overflow-x: hidden;
+  /* Hack to make "rows" attribute apply in Firefox. */ }
+
+/* Underline and Placeholder */
+
+input.question.activeInput:disabled {
+  background: #f1f1f1;
+}
+
+input.question + label,
+textarea.question + label {
+  display: block;
+  position: relative;
+  white-space: nowrap;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-transition: width 0.4s ease;
+  transition: width 0.4s ease;
+  height: 0px; }
+
+input.question:focus + label,
+textarea.question:focus + label {
+  width: 100%;
+  border-color: #0085dc; }
+
+input.question:focus,
+input.question:valid,
+input.question.activeInput {
+  padding-top: 35px; }
+
+input.question:focus + label > span,
+input.question:valid + label > span,
+input.question.activeInput + label > span {
+  top: -60px;
+  font-size: 14px;
+  color: #0085dc; }
+
+textarea.question:focus + label > span,
+textarea.question:valid + label > span {
+  top: -80px;
+  font-size: 14px;
+  color: #0085dc; }
+
+textarea.question:focus,
+textarea.question:valid {
+  padding-top: 25px; }
+
+input.question + label > span,
+textarea.question + label > span {
+  font-weight: 400;
+  margin: 0;
+  position: absolute;
+  color: #8F8F8F;
+  font-size: 17px;
+  top: -30px;
+  right: 0px;
+  z-index: 9;
+  -webkit-transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+  transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease; }
+
+.btnGroup a {
+  margin-left: 15px; }
+
+.fileInputDesign {
+  color: transparent;
+  width: 100%;
+  position: relative; }
+
+.fileInputDesign::-webkit-file-upload-button {
+  visibility: hidden; }
+
+.fileInputDesign::before {
+  content: 'فایل جدید را انتخاب نمایید';
+  width: 100%;
+  text-align: center;
+  color: #8F8F8F;
+  display: inline-block;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 17px;
+  padding-top: 60px;
+  -webkit-transition: all 0.3s;
+  -ms-transition: all 0.3s;
+  transition: all 0.3s; }
+
+.fileInputDesign::after {
+  content: '\e623';
+  font-family: Pe-icon-7-stroke;
+  position: absolute;
+  color: #333;
+  font-size: 35px;
+  top: 10px;
+  right: 0;
+  left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center; }
+
+.fileInputDesign:hover::before {
+  border-color: #0085dc;
+  color: #0085dc; }
+
+.fileInputDesign:hover::after {
+  color: #0085dc; }
+
+.fileInputDesign:active {
+  outline: 0; }
+
+.fileInputDesign:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9); }
+
+.loginPage {
+  display: flex; }
+
+.loginLogo img {
+  width: 120px; }
+
+.loginPage .title h1 {
+  color: white; }
+
+.loginPage .title h3 {
+  color: white;
+  font-size: 14px; }
+
+.loginPage .title h3 a {
+  color: white;
+  border-bottom: 1px dashed white; }
+
+.loginForm {
+  height: 100%;
+  overflow: scroll;
+  padding: 25px;
+  background: #2196f3 url("../img/sign-in-bg.png") no-repeat left bottom; }
+
+.loginForm .moreLinks {
+  text-align: center;
+  margin: 2.5em auto 1.5em; }
+
+.infoBoard {
+  background: url("../img/projects/iranmall-project.jpg") no-repeat;
+  background-size: cover; }

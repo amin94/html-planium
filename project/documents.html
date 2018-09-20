@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="../assets/img/favicon.ico">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <!-- load jquery via CDN -->
+
+  <script type="text/javascript">
+
+    var thisPage = 'documents';
+
+    if (thisPage=='projects') {
+
+      jQuery('.sidebar-wrapper ul.nav').addClass('disn');
+
+    }
+
+  </script>
+
+  <title> پلانیوم </title>
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+
+  <!-- data tables -->
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+  <script src="../assets/js/menu.js" type="text/javascript"></script>
+
+  <!-- date picker -->
+  <script type="text/javascript" charset="utf8" src="../assets/js/persian-datepicker.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="../assets/js/persian-date.min.js"></script>
+  <link href="../assets/css/persian-datepicker.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap core CSS     -->
+  <link href="../assets/css/bootstrap.rtl.min.css" rel="stylesheet" />
+
+  <!-- data table -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+  <!-- Animation library for notifications   -->
+  <link href="../assets/css/animate.min.css" rel="stylesheet"/>
+
+  <!--  Light Bootstrap Table core CSS    -->
+  <link href="../assets/css/style.css" rel="stylesheet"/>
+
+  <!-- scss theme -->
+  <link href="../assets/css/theme.css" rel="stylesheet"/>
+
+
+  <!--     Fonts and icons     -->
+  <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="../assets/css/pe-icon-7-stroke.css" rel="stylesheet" />
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/sweetalert.css">
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+
+    // set dates to fields in form
+    $("#issueStartDate").pDatepicker();
+    $("#issueDueDate").pDatepicker();
+
+
+
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+var projectID = getUrlParameter('pid');
+
+
+
+
+    $.ajax({
+      "dataType" 	: 'json',
+      "url": "http://api.planium.mortz.ir/task/api/v1/",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "token "+usrtkn,
+      },
+    success: function(response, textStatus, jqXHR) {
+        // since we are using jQuery, you don't need to parse response
+        drawTable(response);
+    }
+});
+
+function drawTable(data) {
+    for (var i = 0; i < data.length; i++) {
+        drawRow(data[i]);
+    }
+}
+
+function drawRow(rowData) {
+    var row = $("<tr />")
+    $("#issueTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+    row.append($("<td class='table-website-td center'>" + rowData.category.title + "</td>"));
+    row.append($("<td class='table-website-td center'>" + rowData.title + "</td>"));
+    row.append($("<td class='table-website-td center'>" + rowData.assignee.first_name + " "+ rowData.assignee.last_name +"</td>"));
+
+    if (rowData.status==1) {
+      row.append($("<td class='table-website-td center activeTask'> <span> فعال </span> </td>"));
+    } else {
+      row.append($("<td class='table-website-td center deActiveTask'> <span> غیرفعال </span> </td>"));
+    }
+
+    row.append($("<td class='table-website-td center'>" + rowData.role.due_date + "</td>"));
+}
+
+
+
+
+
+
+
+// add categories to fileds
+var settings = {
+  "url": "http://api.planium.mortz.ir/task/api/v1/issue/categories/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+
+  for (var i = 0; i < response.length; i++) {
+    $('#issueCat').append(new Option(response[i].title, response[i].id, true, false));
+  }
+});
+
+
+
+// add other team members
+var settings = {
+  "url": "http://api.planium.mortz.ir/project/api/v1/members/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+
+  for (var i = 0; i < response.length; i++) {
+    $('#issueAss').append(new Option(response[i].user.first_name+' '+response[i].user.last_name, response[i].user.id, true, false));
+  }
+});
+
+
+  });
+
+
+</script>
+
+
+
+<body dir="rtl">
+	<div class="wrapper">
+		<div class="sidebar">
+
+
+
+	<div class="sidebar-wrapper">
+
+
+    <ul class="nav" >
+    	<li id="projectDetailLink">
+    		<a href="#" name="projectDetailLink">
+    			<i class="pe-7s-home"></i>
+    			<p> داشبورد </p>
+    		</a>
+    	</li>
+    	<li id="mapLink">
+    		<a href="#" name="mapLink">
+          <i class="pe-7s-map"></i>
+    			<p> نقشه‌ها </p>
+    		</a>
+    	</li>
+
+
+    	<li id="documentsLink">
+    		<a href="#" name="documentsLink">
+    			<i class="pe-7s-copy-file"></i>
+    			<p>
+    				اسناد
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="issuesLink">
+    		<a href="#" name="issuesLink">
+    			<i class="pe-7s-albums"></i>
+    			<p>
+    				موضوعات
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="teamLink">
+    		<a href="#" name="teamLink">
+    			<i class="pe-7s-users"></i>
+    			<p>
+    				تیم
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="settingsLink">
+    		<a href="#" name="settingsLink">
+    			<i class="pe-7s-config"></i>
+    			<p>
+    				تنظیمات
+    			</p>
+    		</a>
+    	</li>
+
+
+    </ul>
+
+
+</div>
+</div>
+
+
+<nav class="navbar navbar-default navbar-fixed">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse">
+
+
+      <div class="logo">
+        <a href="/" class="simple-text">
+
+
+          <img src="../assets/img/logo.png" alt="لوگو پلانیوم">
+
+
+        </a>
+      </div>
+
+
+      <div class="navbarBody">
+
+
+        <?php
+
+            if ($inProject) {
+
+              ?>
+
+              <ul class="nav navbar-nav navbar-left">
+                <li class="dropdown" style="line-height:3.4;">
+
+                  <div class="profilePic">
+                    <img src="../assets/img/projects/farmanie-project.jpg" alt="">
+                  </div>
+
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+                    <?php echo $_SESSION['projectName']; ?>
+
+                    <div class="caret"></div>
+
+                  </a>
+
+                  <ul class="dropdown-menu">
+
+                    <?php
+
+
+                      for ($projectListCrawl=0; $projectListCrawl < sizeof($_SESSION['projectsList']); $projectListCrawl++) {
+
+                    ?>
+
+                    <li>
+                      <a href="#">
+                        <?php echo $_SESSION['projectsList'][$projectListCrawl]; ?>
+                      </a>
+                    </li>
+
+                    <!-- <li class="divider"></li> -->
+
+                    <?php
+
+                      }
+
+
+                     ?>
+
+
+                  </ul>
+                </li>
+              </ul>
+
+              <?php
+
+            }
+
+         ?>
+
+
+        <ul class="nav navbar-nav navbar-right">
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i>
+
+              <span class="notification">5</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#">نوتیف ۱</a></li>
+              <li><a href="#">نوتیف ۲</a></li>
+              <li><a href="#">نوتیف ۳</a></li>
+              <li><a href="#">نوتیف ۴</a></li>
+              <li><a href="#">نوتیف دیگر</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown dropdown-with-icons" style="line-height:3.4;">
+
+            <div class="profilePic">
+              <!-- <img src="<?php echo $_SESSION['profilePic'] ?>" alt="پروفایل محمد امین مجیدی"> -->
+            </div>
+
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+              <?php echo $_SESSION['userFullName'] ?>
+
+              <div class="caret"></div>
+
+            </a>
+
+            <ul class="dropdown-menu dropdown-with-icons">
+
+              <li>
+                <a href="http://amins-macbook-pro.local:5757/html-planium/profile.html/">
+                  <i class="pe-7s-config"></i>
+                  پروفایل
+                </a>
+              </li>
+
+              <!-- <li class="divider"></li> -->
+
+              <li>
+                <a href="#" class="text-danger" name="logout">
+                  <i class="pe-7s-power"></i>
+                  خروج
+                </a>
+              </li>
+
+            </ul>
+          </li>
+
+
+
+        </ul>
+
+      </div> <!-- navbar body -->
+
+    </div>
+  </div>
+</nav>
+
+
+
+
+
+
+
+<div class="main-panel">
+
+  <div class="content documents">
+    <div class="container-fluid">
+
+      <div class="row targetBtn">
+        <div class="col-md-12 noPaddingLeft noPaddingRight">
+
+          <div class="title">
+            <h1 class="pull-left"> اسناد </h1>
+
+            <ul class="groupBtns pullLeft">
+
+              <li>
+
+                <a href="#newDocument" name="modalLink" class="btn btn-primary btn-fill btn-icon"> <i class="pe-7s-plus"></i> <span> سند جدید </span> </a>
+
+              </li>
+
+              <li>
+
+                <a href="#filterModal" name="sidebarModal" class="btn btn-primary btn-fill btn-icon"> <i class="pe-7s-filter"></i> <span> فیلتر </span> </a>
+
+              </li>
+
+            </ul>
+
+            <div class="clear"></div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+
+      <div class="row">
+
+        <div class="col-md-4 noPaddingRight">
+
+          <div class="card folder">
+
+            <div class="title">
+              <h4 class="pullRight"> پوشه‌ها </h4>
+
+              <a href="#newFolder" class="pullLeft btn btn-fill btn-primary btn-icon" name="modalLink"> <i class="pe-7s-plus"></i> پوشه جدید </a>
+
+              <div class="clear"></div>
+            </div>
+
+            <div class="folderBody">
+
+              <ul class="folderList nav">
+
+                <li class="folderItem">
+
+                  <a href="#"> <i class="pe-7s-copy-file open"></i> <i class="pe-7s-folder close"></i> قرارداد </a>
+
+                </li>
+
+                <li class="folderItem">
+
+                  <a href="#" class="active"> <i class="pe-7s-copy-file open"></i> <i class="pe-7s-folder close"></i> اسناد فنی ساختمان </a>
+
+                </li>
+
+                <li class="folderItem">
+
+                  <a href="#"> <i class="pe-7s-copy-file open"></i> <i class="pe-7s-folder close"></i> گزارش کارها </a>
+
+                </li>
+
+              </ul>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+
+        <div class="col-md-8 noPaddingLeft">
+
+          <div class="card cardTable documentsTable">
+
+              <div class="title">
+                <h4> اسناد فنی ساختمان </h4>
+              </div>
+
+            <div class="content table-responsive table-full-width">
+
+              <table id="example" class="display table table-hover dropTable websites-table table-selectable" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="center"> </th>
+                            <th class="center"> نام </th>
+                            <th class="center"> تاریخ بارگزاری </th>
+                            <th class="center"> توسط </th>
+                            <th class="center"> لینک به موضوع / نقشه </th>
+                            <th class="center"> مرتبط با </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <!-- <tr class="childList">
+                            <td class="table-website-td center icon"></td>
+                            <td class="table-website-td center"> نتایج تست بتن </td>
+                            <td class="table-website-td center"> ۹۷/۰۲/۲۷ </td>
+                            <td class="table-website-td center">  علیرضا باعثی </td>
+                            <td class="table-website-td center"> A4.6.64 </td>
+                            <td class="table-website-td center"> محمد امین مجیدی </td>
+                        </tr> -->
+
+
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <th class="center"> </th>
+                        <th class="center"> نام </th>
+                        <th class="center"> تاریخ بارگذاری </th>
+                        <th class="center"> توسط </th>
+                        <th class="center"> لینک به موضوع / نقشه </th>
+                        <th class="center"> مرتبط با </th>
+                      </tr>
+                    </tfoot>
+                </table>
+
+
+
+
+            </div>
+          </div> <!-- card cardTable -->
+
+        </div> <!-- grid -->
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+</div> <!-- main panel -->
+</div> <!-- wrapper -->
+
+
+
+
+
+
+<!-- filter modal -->
+
+<div class="modalBody">
+
+  <div class="sidebarMask" data-modalid="filterModal"></div>
+
+  <div class="modalOption" id="filterModal">
+
+    پنجره فیلتر
+
+  </div>
+
+</div>
+
+<!-- filter modal -->
+
+
+
+
+
+
+<!-- new document modal -->
+
+
+
+<!-- new folder modal -->
+
+<div class="modal overlay_container" id="newFolder">
+
+	<div class="mask" data-modalid="newFolder"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> ایجاد پوشه جدید</h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newFolder" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form>
+
+          <div class="formGroup">
+            <input type="text" name="folderName" class="question" id="projectName" required autocomplete="off" />
+            <label for="projectName"><span> نام پوشه </span></label>
+          </div>
+
+          <div class="btnGroup">
+            <button class="btn btn-primary btn-fill btn-ico pullLeft"> <i class="pe-7s-plus"></i> ساخت پوشه جدید </button>
+            <a href="#newFolder" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+<!-- new folder modal -->
+
+
+
+
+<div class="modal overlay_container" id="newDocument">
+
+	<div class="mask" data-modalid="newDocument"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> ایجاد سند جدید</h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newDocument" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form>
+
+          <div class="formGroup">
+            <input type="file" name="documentFile" class="fileInputDesign">
+          </div>
+
+          <div class="formGroup">
+            <input type="text" name="projectName" class="question" id="projectName" required autocomplete="off" />
+            <label for="projectName"><span> نام پروژه </span></label>
+          </div>
+
+          <div class="formGroup">
+            <input type="text" name="projectAddress" class="question" id="projectAddress" required autocomplete="off" />
+            <label for="projectAddress"><span> موقعیت پروژه </span></label>
+          </div>
+
+          <div class="btnGroup">
+            <button class="btn btn-primary btn-fill btn-ico pullLeft"> <i class="pe-7s-plus"></i> ثبت سند جدید </button>
+            <a href="#newDocument" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+<!-- new document modal -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+<!--   Core JS Files   -->
+<script src="../assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+<script src="../assets/js/main.js" type="text/javascript"></script>
+
+<!--  Notifications Plugin    -->
+<script src="../assets/js/bootstrap-notify.js"></script>
+
+<script src="../assets/js/jquery.simpleswitch.min.js"></script>
+<script>
+
+$(".switchdemo").simpleSwitch();
+
+</script>
+
+
+<!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
+<script src="../assets/js/light-bootstrap-dashboard.js"></script>
+
+
+</html>

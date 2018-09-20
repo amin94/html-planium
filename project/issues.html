@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="../assets/img/favicon.ico">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <!-- load jquery via CDN -->
+
+  <script type="text/javascript">
+
+    var thisPage = 'issues';
+
+    if (thisPage=='projects') {
+
+      jQuery('.sidebar-wrapper ul.nav').addClass('disn');
+
+    }
+
+  </script>
+
+  <title> پلانیوم </title>
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+
+  <!-- data tables -->
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+  <script src="../assets/js/menu.js" type="text/javascript"></script>
+
+  <!-- date picker -->
+  <script type="text/javascript" charset="utf8" src="../assets/js/persian-datepicker.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="../assets/js/persian-date.min.js"></script>
+  <link href="../assets/css/persian-datepicker.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap core CSS     -->
+  <link href="../assets/css/bootstrap.rtl.min.css" rel="stylesheet" />
+
+  <!-- data table -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+  <!-- Animation library for notifications   -->
+  <link href="../assets/css/animate.min.css" rel="stylesheet"/>
+
+  <!--  Light Bootstrap Table core CSS    -->
+  <link href="../assets/css/style.css" rel="stylesheet"/>
+
+  <!-- scss theme -->
+  <link href="../assets/css/theme.css" rel="stylesheet"/>
+
+
+  <!--     Fonts and icons     -->
+  <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="../assets/css/pe-icon-7-stroke.css" rel="stylesheet" />
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/sweetalert.css">
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+
+    // set dates to fields in form
+    $("#issueStartDate").pDatepicker();
+    $("#issueDueDate").pDatepicker();
+
+
+    var to, from;
+    to = $(".range-to-example").persianDatepicker({
+    inline: true,
+    altField: '.range-to-example-alt',
+    altFormat: 'LLLL',
+    initialValue: false,
+    autoClose: true,
+    navigator:{
+        scroll:{
+            enabled: false
+        }
+    },
+    toolbox:{
+        calendarSwitch:{
+            enabled: false
+        }
+    },
+    onSelect: function (unix) {
+        to.touched = true;
+        if (from && from.options && from.options.maxDate != unix) {
+            var cachedValue = from.getState().selected.unixDate;
+            from.options = {maxDate: unix};
+            if (from.touched) {
+                from.setDate(cachedValue);
+            }
+        }
+    }
+});
+from = $(".range-from-example").persianDatepicker({
+    inline: true,
+    altField: '.range-from-example-alt',
+    altFormat: 'LLLL',
+    initialValue: false,
+    autoClose: true,
+    navigator:{
+        scroll:{
+            enabled: false
+        }
+    },
+    toolbox:{
+        calendarSwitch:{
+            enabled: false
+        }
+    },
+    onSelect: function (unix) {
+        from.touched = true;
+        if (to && to.options && to.options.minDate != unix) {
+            var cachedValue = to.getState().selected.unixDate;
+            to.options = {minDate: unix};
+            if (to.touched) {
+                to.setDate(cachedValue);
+            }
+        }
+    }
+});
+
+
+
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+var projectID = getUrlParameter('pid');
+
+
+
+
+    $.ajax({
+      "dataType" 	: 'json',
+      "url": "http://api.planium.mortz.ir/task/api/v1/"+projectID,
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "token "+usrtkn,
+      },
+    success: function(response, textStatus, jqXHR) {
+        // since we are using jQuery, you don't need to parse response
+        drawTable(response);
+    }
+});
+
+function drawTable(data) {
+    for (var i = 0; i < data.length; i++) {
+        drawRow(data[i]);
+    }
+}
+
+function drawRow(rowData) {
+    var row = $("<tr />")
+    $("#issueTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+    row.append($("<td class='table-website-td center'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a>" + rowData.category.title + "</td>"));
+    row.append($("<td class='table-website-td center'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a>" + rowData.title + "</td>"));
+    row.append($("<td class='table-website-td center'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a>" + rowData.assignee.first_name + " "+ rowData.assignee.last_name +"</td>"));
+
+    if (rowData.status==0) {
+      row.append($("<td class='table-website-td center activeTask'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a> <span> در حال انجام </span> </td>"));
+    } else if (rowData.status==1){
+      row.append($("<td class='table-website-td center endTask'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a> <span> کنسل </span> </td>"));
+    } else if (rowData.status==2) {
+      row.append($("<td class='table-website-td center activeTask'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a> <span> انجام شد </span> </td>"));
+    } else if (rowData.status==3) {
+      row.append($("<td class='table-website-td center activeTask'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a> <span> پیش نویس </span> </td>"));
+    }
+
+    row.append($("<td class='table-website-td center'> <a href='#issueDetail' name='ajaxModalLink' class='more' data-targetID='" + rowData.id + "'></a>" + rowData.due_date + "</td>"));
+}
+
+
+
+
+
+
+
+// add categories to fileds
+var settings = {
+  "url": "http://api.planium.mortz.ir/task/api/v1/issue/categories/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+
+  for (var i = 0; i < response.length; i++) {
+    $('#issueCat').append(new Option(response[i].title, response[i].id, true, false));
+    $('#issueDetail #issueCat').append(new Option(response[i].title, response[i].id, true, false));
+  }
+});
+
+
+
+// add other team members
+var settings = {
+  "url": "http://api.planium.mortz.ir/project/api/v1/members/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+
+  for (var i = 0; i < response.length; i++) {
+    $('#issueAss').append(new Option(response[i].user.first_name+' '+response[i].user.last_name, response[i].user.id, true, false));
+    $('#issueDetail #issueAss').append(new Option(response[i].user.first_name+' '+response[i].user.last_name, response[i].user.id, true, false));
+    $('#issueDetail #issueFlwer').append(new Option(response[i].user.first_name+' '+response[i].user.last_name, response[i].user.id, true, false));
+  }
+});
+
+
+  });
+
+
+</script>
+
+
+
+<body dir="rtl">
+	<div class="wrapper">
+		<div class="sidebar">
+
+
+
+	<div class="sidebar-wrapper">
+
+
+    <ul class="nav" >
+    	<li id="projectDetailLink">
+    		<a href="#" name="projectDetailLink">
+    			<i class="pe-7s-home"></i>
+    			<p> داشبورد </p>
+    		</a>
+    	</li>
+    	<li id="mapLink">
+    		<a href="#" name="mapLink">
+          <i class="pe-7s-map"></i>
+    			<p> نقشه‌ها </p>
+    		</a>
+    	</li>
+
+
+    	<li id="documentsLink">
+    		<a href="#" name="documentsLink">
+    			<i class="pe-7s-copy-file"></i>
+    			<p>
+    				اسناد
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="issuesLink">
+    		<a href="#" name="issuesLink">
+    			<i class="pe-7s-albums"></i>
+    			<p>
+    				موضوعات
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="teamLink">
+    		<a href="#" name="teamLink">
+    			<i class="pe-7s-users"></i>
+    			<p>
+    				تیم
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="settingsLink">
+    		<a href="#" name="settingsLink">
+    			<i class="pe-7s-config"></i>
+    			<p>
+    				تنظیمات
+    			</p>
+    		</a>
+    	</li>
+
+
+    </ul>
+
+
+</div>
+</div>
+
+
+<nav class="navbar navbar-default navbar-fixed">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse">
+
+
+      <div class="logo">
+        <a href="/" class="simple-text">
+
+
+          <img src="../assets/img/logo.png" alt="لوگو پلانیوم">
+
+
+        </a>
+      </div>
+
+
+      <div class="navbarBody">
+
+
+        <?php
+
+            if ($inProject) {
+
+              ?>
+
+              <ul class="nav navbar-nav navbar-left">
+                <li class="dropdown" style="line-height:3.4;">
+
+                  <div class="profilePic">
+                    <img src="../assets/img/projects/farmanie-project.jpg" alt="">
+                  </div>
+
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+                    <?php echo $_SESSION['projectName']; ?>
+
+                    <div class="caret"></div>
+
+                  </a>
+
+                  <ul class="dropdown-menu">
+
+                    <?php
+
+
+                      for ($projectListCrawl=0; $projectListCrawl < sizeof($_SESSION['projectsList']); $projectListCrawl++) {
+
+                    ?>
+
+                    <li>
+                      <a href="#">
+                        <?php echo $_SESSION['projectsList'][$projectListCrawl]; ?>
+                      </a>
+                    </li>
+
+                    <!-- <li class="divider"></li> -->
+
+                    <?php
+
+                      }
+
+
+                     ?>
+
+
+                  </ul>
+                </li>
+              </ul>
+
+              <?php
+
+            }
+
+         ?>
+
+
+        <ul class="nav navbar-nav navbar-right">
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i>
+
+              <span class="notification">5</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#">نوتیف ۱</a></li>
+              <li><a href="#">نوتیف ۲</a></li>
+              <li><a href="#">نوتیف ۳</a></li>
+              <li><a href="#">نوتیف ۴</a></li>
+              <li><a href="#">نوتیف دیگر</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown dropdown-with-icons" style="line-height:3.4;">
+
+            <div class="profilePic">
+              <!-- <img src="<?php echo $_SESSION['profilePic'] ?>" alt="پروفایل محمد امین مجیدی"> -->
+            </div>
+
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+              <?php echo $_SESSION['userFullName'] ?>
+
+              <div class="caret"></div>
+
+            </a>
+
+            <ul class="dropdown-menu dropdown-with-icons">
+
+              <li>
+                <a href="http://amins-macbook-pro.local:5757/html-planium/profile.html/">
+                  <i class="pe-7s-config"></i>
+                  پروفایل
+                </a>
+              </li>
+
+              <!-- <li class="divider"></li> -->
+
+              <li>
+                <a href="#" class="text-danger" name="logout">
+                  <i class="pe-7s-power"></i>
+                  خروج
+                </a>
+              </li>
+
+            </ul>
+          </li>
+
+
+
+        </ul>
+
+      </div> <!-- navbar body -->
+
+    </div>
+  </div>
+</nav>
+
+
+
+
+<div class="main-panel">
+
+  <div class="content">
+    <div class="container-fluid">
+
+      <div class="row targetBtn">
+        <div class="col-md-12 noPaddingLeft noPaddingRight">
+
+          <div class="title">
+            <h1 class="pull-left"> موضوعات </h1>
+            <a href="#newIssue" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus"></i> <span> موضوع جدید </span> </a>
+            <div class="clear"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-12">
+
+              <div class="content table-responsive table-full-width">
+
+                <table id="issueTable" class="card cardTable display table table-hover websites-table table-selectable" style="width:100%">
+                      <thead>
+                          <tr>
+                              <th class="center"> دسته </th>
+                              <th class="center"> عنوان </th>
+                              <th class="center"> محول به </th>
+                              <th class="center"> وضعیت </th>
+                              <th class="center"> مهلت انجام </th>
+                          </tr>
+                      </thead>
+                      <tbody>
+
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th class="center"> دسته </th>
+                          <th class="center"> عنوان </th>
+                          <th class="center"> محول به </th>
+                          <th class="center"> وضعیت </th>
+                          <th class="center"> مهلت انجام </th>
+                        </tr>
+                      </tfoot>
+                  </table>
+
+
+
+
+              </div>
+
+
+
+
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+</div> <!-- main panel -->
+</div> <!-- wrapper -->
+
+
+
+
+<!-- modal -->
+
+<div class="modal overlay_container" id="newIssue">
+
+	<div class="mask" data-modalid="newIssue"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن موضوع جدید </h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newIssue" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newIssueForm">
+
+          <div class="formGroup">
+            <input type="text" name="issueTitle" id="issueTitle" class="question" required autocomplete="off" />
+            <label for="issueTitle"><span> عنوان موضوع </span></label>
+          </div>
+
+
+          <div class="formGroup">
+            <input type="text" name="issueDesc" id="issueDesc" class="question" required autocomplete="off" />
+            <label for="issueDesc"><span> توضیح موضوع </span></label>
+          </div>
+
+          <div class="formGroup col-md-11 noPaddingRight">
+            <select name="issueCat" id="issueCat" class="question" required autocomplete="off" />
+
+              <option value=""> دسته بندی موضوع </option>
+
+            </select>
+          </div>
+
+          <div class="formGroup col-md-1 noPaddingLeft">
+            <a href="#newCat" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus" style="margin:auto"></i></a>
+          </div>
+
+
+          <div class="formGroup">
+            <select name="issueAss" id="issueAss" class="question" required autocomplete="off" />
+
+              <option value=""> محول به </option>
+
+            </select>
+          </div>
+
+
+          <div class="formGroup">
+            <select name="issueStatus" id="issueStatus" class="question" required autocomplete="off" />
+
+              <option value=""> وضعیت موضوع </option>
+              <option value="0"> در حال انجام </option>
+              <option value="1"> کنسل </option>
+              <option value="2"> انجام شده </option>
+              <option value="3"> پیش نویس </option>
+
+            </select>
+          </div>
+
+
+          <div class="col-md-6 formGroup noPaddingRight">
+
+            <input type="text" name="issueStartDate" class="question range-from-example-alt" required id="startDateInput">
+            <label for="startDateInput"><span> تاریخ شروع </span></label>
+            <div class="range-from-example"></div>
+
+          </div>
+          <div class="col-md-6 formGroup noPaddingLeft">
+
+            <input type="text" name="issueDueDate" class="question range-to-example-alt" required id="dueDateInput">
+            <label for="dueDateInput"> <span> مهلت انجام </span> </label>
+            <div class="range-to-example"></div>
+
+          </div>
+
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن موضوع جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newIssue" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal overlay_container" id="newCat">
+
+	<div class="mask" data-modalid="newCat"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن دسته‌بندی جدید </h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newIssue" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newCatForm">
+
+          <div class="formGroup">
+            <input type="text" name="categoryName" id="categoryName" class="question" required autocomplete="off" />
+            <label for="categoryName"><span> عنوان دسته موضوع </span></label>
+          </div>
+
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن دسته جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newCat" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- tasks detail show modal -->
+
+<div class="modal overlay_container" id="issueDetail">
+
+	<div class="mask" data-modalid="issueDetail"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> ویرایش <span></span> </h3>
+              <p> ساخته شده توسط <span></span> </p>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#issueDetail" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="issueDetailForm">
+
+          <div class="formGroup">
+            <input type="text" name="issueTitle" id="issueTitle" class="question" required autocomplete="off" />
+            <label for="issueTitle"><span> عنوان موضوع </span></label>
+          </div>
+
+
+          <div class="formGroup">
+            <input type="text" name="issueDesc" id="issueDesc" class="question" required autocomplete="off" />
+            <label for="issueDesc"><span> توضیح موضوع </span></label>
+          </div>
+
+          <div class="formGroup col-md-11 noPaddingRight">
+            <select name="issueCat" id="issueCat" class="question" required autocomplete="off" />
+
+              <option value=""> دسته بندی موضوع </option>
+
+            </select>
+          </div>
+
+          <div class="formGroup col-md-1 noPaddingLeft">
+            <a href="#newCat" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus" style="margin:auto"></i></a>
+          </div>
+
+
+          <div class="formGroup">
+            <select name="issueAss" id="issueAss" class="question" required autocomplete="off" />
+
+              <option value=""> محول به </option>
+
+            </select>
+          </div>
+
+
+          <div class="formGroup">
+            <select name="issueFlwer" id="issueFlwer" class="question" required autocomplete="off" multiple />
+
+              <option value=""> دنبال کننده موضوع </option>
+
+            </select>
+          </div>
+
+
+          <div class="formGroup">
+            <select name="issueStatus" id="issueStatus" class="question" required autocomplete="off" />
+
+              <option value=""> وضعیت موضوع </option>
+              <option value="0"> در حال انجام </option>
+              <option value="1"> کنسل </option>
+              <option value="2"> انجام شده </option>
+              <option value="3"> پیش نویس </option>
+
+            </select>
+          </div>
+
+
+          <div class="col-md-6 formGroup noPaddingRight">
+
+            <input type="text" name="issueStartDate" class="question range-from-example-alt" required id="startDateInput">
+            <label for="startDateInput"><span> تاریخ شروع </span></label>
+            <div class="range-from-example"></div>
+
+          </div>
+          <div class="col-md-6 formGroup noPaddingLeft">
+
+            <input type="text" name="issueDueDate" class="question range-to-example-alt" required id="dueDateInput">
+            <label for="dueDateInput"> <span> مهلت انجام </span> </label>
+            <div class="range-to-example"></div>
+
+          </div>
+
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-pen"></i> ویرایش موضوع </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#issueDetail" class="btn btn-fill btn-sec pullLeft" name="closeModal"> بستن </a>
+
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+<!-- tasks detail show modal -->
+
+<!-- modal -->
+
+
+
+
+
+
+
+
+<!-- submit forms process -->
+<script>
+
+$(document).ready(function() {
+
+  $('form').submit(function(e) {
+
+    e.preventDefault();
+
+    var formID = $(this).attr('id');
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+    var projectID = getUrlParameter('pid');
+
+      $("#btnSubmit").prop("disabled", true);
+
+
+      if (formID === 'newIssueForm') {
+
+
+        var issueStatus = $('input[name=issueStatus]').val();
+
+
+        var startDate = $('input[name=issueStartDate]').val();
+        var dueDate = $('input[name=issueDueDate]').val();
+
+        console.log(startDate);
+
+        var formData = {
+          'status' 			: issueStatus,
+          'title'       : $('input[name=issueTitle]').val(),
+          'category_id'    : $('#issueCat').val(),
+          'assignee'    : $('#issueAss').val(),
+          'description' : $('#issueDesc').val(),
+          'start_date'  : startDate,
+          'due_date'  : dueDate,
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/task/api/v1/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          // location.reload();
+        });
+
+      }
+
+
+      else if (formID === 'newCatForm') {
+
+
+        var formData = {
+          'title' 			: $('input[name=categoryName]').val(),
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/task/api/v1/issue/categories/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          location.reload();
+        });
+
+
+
+      }
+
+
+  });
+
+
+  });
+
+</script>
+
+
+
+
+
+
+</body>
+<!--   Core JS Files   -->
+<script src="../assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+<script src="../assets/js/main.js" type="text/javascript"></script>
+
+<!--  Notifications Plugin    -->
+<script src="../assets/js/bootstrap-notify.js"></script>
+
+<script src="../assets/js/jquery.simpleswitch.min.js"></script>
+<script>
+
+$(".switchdemo").simpleSwitch();
+
+</script>
+
+
+<!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
+<script src="../assets/js/light-bootstrap-dashboard.js"></script>
+
+
+</html>

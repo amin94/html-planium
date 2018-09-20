@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="assets/img/favicon.ico">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <title> پلانیوم </title>
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+
+
+  <!-- Bootstrap core CSS     -->
+  <link href="assets/css/bootstrap.rtl.min.css" rel="stylesheet" />
+
+  <!-- data table -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+  <!-- Animation library for notifications   -->
+  <link href="assets/css/animate.min.css" rel="stylesheet"/>
+
+  <!--  Light Bootstrap Table core CSS    -->
+  <link href="assets/css/style.css" rel="stylesheet"/>
+
+  <!-- scss theme -->
+  <link href="assets/css/theme.css" rel="stylesheet"/>
+
+
+  <!--     Fonts and icons     -->
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="assets/css/pe-icon-7-stroke.css" rel="stylesheet" />
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <link rel="stylesheet" href="assets/css/sweetalert.css">
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> <!-- load jquery via CDN -->
+
+
+  <!-- angular js -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+
+  <script src="assets/js/main.js" type="text/javascript"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+
+
+
+<script type="text/javascript">
+
+var usrtkn = getCookie("usrtkn");
+
+if (usrtkn!='') {
+
+  window.location.href = "http://amins-macbook-pro.local:5757/html-planium/projects.html";
+
+}
+
+</script>
+
+
+
+
+<body dir="rtl">
+	<div class="wrapper loginPage">
+
+    <div class="col-md-5 loginForm">
+
+      <div class="loginLogo">
+
+        <a href="/" class="simple-text">
+
+          <img src="assets/img/loginLogo.png" alt="لوگو پلانیوم">
+
+        </a>
+
+      </div>
+
+      <div class="title">
+        <h1> ورود </h1>
+        <h3> هنوز ثبت نام نکرده‌اید؟ <a href="register.html"> ثبت نام کنید </a> </h3>
+      </div>
+
+        <form action="" method="post">
+
+          <div class="card">
+
+            <div class="content">
+
+              <div class="formGroup" id="email_group">
+                <input type="email" name="email" class="question" id="emailInput" required autocomplete="off" />
+                <label for="emailInput"><span> ایمیل </span></label>
+              </div>
+
+              <div class="formGroup" id="passwd_group">
+                <input type="password" name="passwd" class="question" id="passwdInput" required autocomplete="off" />
+                <label for="passwdInput"><span> رمز عبور </span></label>
+              </div>
+
+
+            </div>
+
+            <div class="footer text-center" id="submit_group">
+              <button type="submit" class="btn btn-fill btn-primary btn-wd">
+                      <span class="submit_txt">ورود</span>
+                      <span class="process_txt"> لطفا صبر کنید </span>
+
+              </button>
+            </div>
+
+
+
+            <div class="moreLinks">
+
+              <a href="#"> رمز عبورتان را فراموش کرده‌اید؟ </a>
+
+            </div>
+
+
+
+          </div> <!-- card -->
+
+        </form>
+
+    </div> <!-- grid -->
+
+
+    <div class="col-md-7 infoBoard">
+
+
+
+    </div> <!-- grid -->
+
+  </div> <!-- wrapper -->
+
+
+
+
+  <!-- submit form -->
+  <script type="text/javascript">
+
+  $(document).ready(function() {
+
+    // process the form
+    $('form').submit(function(event) {
+
+      event.preventDefault();
+
+      var formData = {
+  			'email' 			: $('input[name=email]').val(),
+  			'password' 			: $('input[name=passwd]').val(),
+        'fcm_id'        : '1'
+
+  		};
+
+      var finalFormData = JSON.stringify(formData);
+
+      var settings = {
+        "url": "http://api.planium.mortz.ir/authentication/api/v1/login",
+        "method": "POST",
+        "headers": {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        "processData": false,
+        "data": finalFormData
+      }
+
+      $.ajax(settings).done(function (response) {
+        console.log(response);
+
+        setCookie('usrtkn',response.token,1);
+        setCookie('fName',response.first_name,1);
+
+        window.location.href = "http://amins-macbook-pro.local:5757/html-planium/projects.html";
+      });
+
+    });
+
+  });
+
+  </script>
+
+
+</body>
+<!--   Core JS Files   -->
+<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+<!--  Notifications Plugin    -->
+<script src="assets/js/bootstrap-notify.js"></script>
+
+<script src="assets/js/jquery.simpleswitch.min.js"></script>
+<script>
+
+$(".switchdemo").simpleSwitch();
+
+</script>
+
+<!--  Google Maps Plugin    -->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+<!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
+<script src="assets/js/light-bootstrap-dashboard.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+	// $.notify({
+	//     icon: 'pe-7s-gift',
+	//     message: "به <b> بیلینک فالوور </b> خوش اومدید. <br/> در صورت وجود هرگونه سوال با پشتیبانی در ارتباط باشید."
+  //
+	// },{
+	//     type: 'info',
+	//     timer: 4000
+	// });
+
+
+
+});
+</script>
+
+</html>

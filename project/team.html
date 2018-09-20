@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/png" href="../assets/img/favicon.ico">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <!-- load jquery via CDN -->
+
+  <script type="text/javascript">
+
+    var thisPage = 'team';
+
+    if (thisPage=='projects') {
+
+      jQuery('.sidebar-wrapper ul.nav').addClass('disn');
+
+    }
+
+  </script>
+
+  <title> پلانیوم </title>
+
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+
+  <!-- data tables -->
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+  <script src="../assets/js/menu.js" type="text/javascript"></script>
+
+  <!-- Bootstrap core CSS     -->
+  <link href="../assets/css/bootstrap.rtl.min.css" rel="stylesheet" />
+
+  <!-- data table -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+  <!-- Animation library for notifications   -->
+  <link href="../assets/css/animate.min.css" rel="stylesheet"/>
+
+  <!--  Light Bootstrap Table core CSS    -->
+  <link href="../assets/css/style.css" rel="stylesheet"/>
+
+  <!-- scss theme -->
+  <link href="../assets/css/theme.css" rel="stylesheet"/>
+
+
+  <!--     Fonts and icons     -->
+  <link href="../assets/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="../assets/css/pe-icon-7-stroke.css" rel="stylesheet" />
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/sweetalert.css">
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+</head>
+
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+
+  var projectID = getUrlParameter('pid');
+
+    $.ajax({
+      "dataType" 	: 'json',
+      "async": true,
+      "crossDomain": true,
+      "url": "http://api.planium.mortz.ir/project/api/v1/members/"+projectID,
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "token "+usrtkn,
+      },
+    success: function(response, textStatus, jqXHR) {
+        // since we are using jQuery, you don't need to parse response
+        drawTable(response);
+    }
+});
+
+function drawTable(data) {
+    for (var i = 0; i < data.length; i++) {
+        drawRow(data[i]);
+    }
+}
+
+function drawRow(rowData) {
+    var row = $("<tr />")
+    $("#teamTable").append(row); //this will append tr element to table... keep its reference for a while since we will add cels into it
+    row.append($("<td class='table-website-td center'>" + rowData.user.first_name + " "+ rowData.user.last_name +"</td>"));
+    row.append($("<td class='table-website-td center'>" + rowData.role.role_number + "</td>"));
+    row.append($("<td class='table-website-td center'>" + rowData.slug.slug + "</td>"));
+    row.append($("<td class='table-website-td center'>" + rowData.expertise.expertise + "</td>"));
+}
+
+
+
+
+
+
+
+// add options for roles and ...
+var roles = {
+  "url": "http://api.planium.mortz.ir/project/api/v1/role/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(roles).done(function (rolesResponse) {
+  console.log(rolesResponse);
+
+  for (var i = 0; i < rolesResponse.length; i++) {
+    $('#role').append(new Option(rolesResponse[i].name, rolesResponse[i].id, true, false));
+  }
+});
+
+
+
+// add options for slug and ...
+var slugs = {
+  "url": "http://api.planium.mortz.ir/project/api/v1/slug/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(slugs).done(function (slugsResponse) {
+  console.log(slugsResponse);
+
+  for (var i = 0; i < slugsResponse.length; i++) {
+    $('#slug').append(new Option(slugsResponse[i].slug, slugsResponse[i].id, true, false));
+  }
+});
+
+
+// add options for expertise and ...
+var expertises = {
+  "url": "http://api.planium.mortz.ir/project/api/v1/expertise/"+projectID,
+  "method": "GET",
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "token "+usrtkn,
+  }
+}
+
+$.ajax(expertises).done(function (expertisesResponse) {
+  console.log(expertisesResponse);
+
+  for (var i = 0; i < expertisesResponse.length; i++) {
+    $('#expertise').append(new Option(expertisesResponse[i].expertise, expertisesResponse[i].id, true, false));
+  }
+});
+
+
+  });
+
+
+</script>
+
+
+
+<body dir="rtl">
+	<div class="wrapper">
+		<div class="sidebar">
+
+
+
+	<div class="sidebar-wrapper">
+
+
+    <ul class="nav" >
+    	<li id="projectDetailLink">
+    		<a href="#" name="projectDetailLink">
+    			<i class="pe-7s-home"></i>
+    			<p> داشبورد </p>
+    		</a>
+    	</li>
+    	<li id="mapLink">
+    		<a href="#" name="mapLink">
+          <i class="pe-7s-map"></i>
+    			<p> نقشه‌ها </p>
+    		</a>
+    	</li>
+
+
+    	<li id="documentsLink">
+    		<a href="#" name="documentsLink">
+    			<i class="pe-7s-copy-file"></i>
+    			<p>
+    				اسناد
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="issuesLink">
+    		<a href="#" name="issuesLink">
+    			<i class="pe-7s-albums"></i>
+    			<p>
+    				موضوعات
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="teamLink">
+    		<a href="#" name="teamLink">
+    			<i class="pe-7s-users"></i>
+    			<p>
+    				تیم
+    			</p>
+    		</a>
+    	</li>
+
+
+    	<li id="settingsLink">
+    		<a href="#" name="settingsLink">
+    			<i class="pe-7s-config"></i>
+    			<p>
+    				تنظیمات
+    			</p>
+    		</a>
+    	</li>
+
+
+    </ul>
+
+
+</div>
+</div>
+
+
+<nav class="navbar navbar-default navbar-fixed">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse">
+
+
+      <div class="logo">
+        <a href="/" class="simple-text">
+
+
+          <img src="../assets/img/logo.png" alt="لوگو پلانیوم">
+
+
+        </a>
+      </div>
+
+
+      <div class="navbarBody">
+
+
+        <?php
+
+            if ($inProject) {
+
+              ?>
+
+              <ul class="nav navbar-nav navbar-left">
+                <li class="dropdown" style="line-height:3.4;">
+
+                  <div class="profilePic">
+                    <img src="../assets/img/projects/farmanie-project.jpg" alt="">
+                  </div>
+
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+                    <?php echo $_SESSION['projectName']; ?>
+
+                    <div class="caret"></div>
+
+                  </a>
+
+                  <ul class="dropdown-menu">
+
+                    <?php
+
+
+                      for ($projectListCrawl=0; $projectListCrawl < sizeof($_SESSION['projectsList']); $projectListCrawl++) {
+
+                    ?>
+
+                    <li>
+                      <a href="#">
+                        <?php echo $_SESSION['projectsList'][$projectListCrawl]; ?>
+                      </a>
+                    </li>
+
+                    <!-- <li class="divider"></li> -->
+
+                    <?php
+
+                      }
+
+
+                     ?>
+
+
+                  </ul>
+                </li>
+              </ul>
+
+              <?php
+
+            }
+
+         ?>
+
+
+        <ul class="nav navbar-nav navbar-right">
+
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-bell-o"></i>
+
+              <span class="notification">5</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#">نوتیف ۱</a></li>
+              <li><a href="#">نوتیف ۲</a></li>
+              <li><a href="#">نوتیف ۳</a></li>
+              <li><a href="#">نوتیف ۴</a></li>
+              <li><a href="#">نوتیف دیگر</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown dropdown-with-icons" style="line-height:3.4;">
+
+            <div class="profilePic">
+              <!-- <img src="<?php echo $_SESSION['profilePic'] ?>" alt="پروفایل محمد امین مجیدی"> -->
+            </div>
+
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true" style="float:left; line-height: 1;">
+
+              <?php echo $_SESSION['userFullName'] ?>
+
+              <div class="caret"></div>
+
+            </a>
+
+            <ul class="dropdown-menu dropdown-with-icons">
+
+              <li>
+                <a href="http://amins-macbook-pro.local:5757/html-planium/profile.html/">
+                  <i class="pe-7s-config"></i>
+                  پروفایل
+                </a>
+              </li>
+
+              <!-- <li class="divider"></li> -->
+
+              <li>
+                <a href="#" class="text-danger" name="logout">
+                  <i class="pe-7s-power"></i>
+                  خروج
+                </a>
+              </li>
+
+            </ul>
+          </li>
+
+
+
+        </ul>
+
+      </div> <!-- navbar body -->
+
+    </div>
+  </div>
+</nav>
+
+
+
+
+
+
+<div class="main-panel container-fluid">
+
+  <div class="content">
+    <div class="container-fluid">
+
+      <div class="row targetBtn">
+        <div class="col-md-12 noPaddingLeft noPaddingRight">
+
+          <div class="title">
+            <h1 class="pull-left"> اعضای تیم </h1>
+
+            <ul class="groupBtns pullLeft">
+
+              <li>
+
+                <a href="#newMember" name="modalLink" class="btn btn-primary btn-fill btn-icon"> <i class="pe-7s-add-user"></i> <span> عضو جدید </span> </a>
+
+              </li>
+
+            </ul>
+            <div class="clear"></div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="content table-responsive table-full-width">
+
+
+
+              <table id="teamTable" class="card cardTable display table table-hover websites-table table-selectable" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="center">نام و نام خانوادگی</th>
+                            <th class="center"> سطح دسترسی </th>
+                            <th class="center"> سمت </th>
+                            <th class="center"> تخصص </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                          <th class="center">نام و نام خانوادگی</th>
+                          <th class="center"> سطح دسترسی </th>
+                          <th class="center"> سمت </th>
+                          <th class="center"> تخصص </th>
+                      </tr>
+                    </tfoot>
+                </table>
+
+
+
+
+            </div>
+
+        </div> <!-- col-xs-12 grid -->
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+</div> <!-- main panel -->
+</div> <!-- wrapper -->
+
+
+
+<!-- modal -->
+
+<div class="modal overlay_container" id="newMember">
+
+	<div class="mask" data-modalid="newMember"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن عضو جدید </h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newMember" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newMemberForm">
+
+          <div class="formGroup">
+            <input type="text" name="mobile" class="question" required autocomplete="off" />
+            <label for="projectName"><span> شماره موبایل </span></label>
+          </div>
+
+          <div class="formGroup">
+            <input type="email" name="email" class="question" required autocomplete="off" />
+            <label for="projectAddress"><span> آدرس ایمیل </span></label>
+          </div>
+
+          <div class="formGroup">
+            <input type="text" name="firstName" class="question" required autocomplete="off" />
+            <label for="projectAddress"><span> نام </span></label>
+          </div>
+
+          <div class="formGroup">
+            <input type="text" name="lastName" class="question" required autocomplete="off" />
+            <label for="projectAddress"><span> نام خانوادگی </span></label>
+          </div>
+
+          <div class="formGroup col-md-11 noPaddingRight">
+            <select name="role" id="role" class="question" required autocomplete="off" />
+
+              <option value=""> دسته کاربری </option>
+
+            </select>
+          </div>
+
+          <div class="formGroup col-md-1 noPaddingLeft">
+            <a href="#newRole" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus" style="margin:auto"></i></a>
+          </div>
+
+          <div class="formGroup col-md-11 noPaddingRight">
+            <select name="slug" id="slug" class="question" required autocomplete="off" />
+
+              <option value=""> نقش در پروژه </option>
+
+            </select>
+          </div>
+
+          <div class="formGroup col-md-1 noPaddingLeft">
+            <a href="#newSlug" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus" style="margin:auto"></i></a>
+          </div>
+
+          <div class="formGroup col-md-11 noPaddingRight">
+            <select name="expertise" id="expertise" class="question" required autocomplete="off" />
+
+              <option value=""> تخصص فردی </option>
+
+            </select>
+          </div>
+
+          <div class="formGroup col-md-1 noPaddingLeft">
+            <a href="#newExp" name="modalLink" class="btn btn-primary btn-fill btn-icon pull-right"> <i class="pe-7s-plus" style="margin:auto"></i></a>
+          </div>
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن عضو جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newMember" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- modal -->
+
+<div class="modal overlay_container" id="newRole">
+
+	<div class="mask" data-modalid="newMember"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن سطح کاربری جدید </h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newRole" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newRoleForm">
+
+          <div class="formGroup">
+            <input type="text" name="roleTitle" class="question" required autocomplete="off" />
+            <label for="roleTitle"><span> نام سطح کاربری </span></label>
+          </div>
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن سطح کاربری جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newRole" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- modal -->
+
+<div class="modal overlay_container" id="newSlug">
+
+	<div class="mask" data-modalid="newSlug"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن نقش جدید برای پروژه</h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newSlug" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newSlugForm">
+
+          <div class="formGroup">
+            <input type="text" name="slugName" class="question" required autocomplete="off" />
+            <label for="slugName"><span> نام نقش کاربری پروژه </span></label>
+          </div>
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن سطح کاربری جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newSlug" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+
+
+
+
+<!-- modal -->
+
+<div class="modal overlay_container" id="newExp">
+
+	<div class="mask" data-modalid="newExp"></div>
+
+	<div class="overlay">
+
+		<div class="form_box order_form">
+
+			<div class="form_box_header">
+
+				<div class="title">
+
+					<div class="box_actions">
+
+						<div class="box_action_grid col-xs-10">
+
+							<h3> افزودن نقش جدید برای پروژه</h3>
+
+						</div>
+
+						<div class="box_action_grid col-xs-2">
+
+							<a href="#newExp" class="closeBtn" name="closeModal"> <i class="pe-7s-close"></i> </a>
+
+						</div>
+
+						<div class="clear"></div>
+
+					</div> <!-- box actions -->
+
+
+				</div>
+
+			</div> <!-- form box header -->
+
+			<div class="form_content">
+
+        <form method="post" id="newExpForm">
+
+          <div class="formGroup">
+            <input type="text" name="expName" class="question" required autocomplete="off" />
+            <label for="expName"><span> نام نقش کاربری پروژه </span></label>
+          </div>
+
+          <div class="btnGroup">
+            <button type="submit" id="btnSubmit" class="btn btn-primary btn-fill btn-ico pullLeft">
+                    <span class="submit_txt"> <i class="pe-7s-plus"></i> افزودن سطح کاربری جدید </span>
+                    <span class="process_txt"> لطفا صبر کنید </span>
+
+            </button>
+            <a href="#newExp" class="btn btn-fill btn-sec pullLeft" name="closeModal"> انصراف </a>
+          </div>
+
+          <div class="clear"></div>
+        </form>
+
+
+			</div> <!-- form content -->
+
+		</div> <!-- form box -->
+
+	</div> <!-- overlay -->
+
+</div> <!-- overlay_conteinar -->
+
+
+<!-- modal -->
+
+
+
+
+
+
+
+
+<!-- process script -->
+<script>
+
+$(document).ready(function() {
+
+  $('form').submit(function(e) {
+
+    e.preventDefault();
+
+    var formID = $(this).attr('id');
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+    var projectID = getUrlParameter('pid');
+
+      $("#btnSubmit").prop("disabled", true);
+
+      if (formID === 'newMemberForm') {
+
+        var formData = {
+          'mobile' 			: $('input[name=mobile]').val(),
+          'email' 			: $('input[name=email]').val(),
+          'first_name' 			: $('input[name=firstName]').val(),
+          'last_name' 			: $('input[name=lastName]').val(),
+          'slug' 			: $('#slug').val(),
+          'role' 			: $('#role').val(),
+          'expertise' 			: $('#expertise').val()
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/project/api/v1/members/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          location.reload();
+        });
+
+      }
+
+
+      else if (formID === "newRoleForm") {
+
+        var formData = {
+          'name' 			: $('input[name=roleTitle]').val(),
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/project/api/v1/role/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          location.reload();
+        });
+
+      }
+
+
+
+      else if (formID === "newSlugForm") {
+
+        var formData = {
+          'name' 			: $('input[name=slugName]').val(),
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/project/api/v1/slug/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          location.reload();
+        });
+
+      }
+
+
+
+      else if (formID === 'newExpForm') {
+
+        var formData = {
+          'expertise' 			: $('input[name=expName]').val(),
+        };
+
+        var finalFormData = JSON.stringify(formData);
+
+        var settings = {
+          "url": "http://api.planium.mortz.ir/project/api/v1/expertise/"+projectID,
+          "method": "POST",
+          "headers": {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": "token "+usrtkn,
+          },
+          "data": finalFormData,
+        }
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          location.reload();
+        });
+
+      }
+
+
+  });
+
+
+  });
+
+</script>
+
+
+
+</body>
+<!--   Core JS Files   -->
+<script src="../assets/js/bootstrap.min.js" type="text/javascript"></script>
+
+
+<script src="../assets/js/main.js" type="text/javascript"></script>
+
+<!--  Notifications Plugin    -->
+<script src="../assets/js/bootstrap-notify.js"></script>
+
+<script src="../assets/js/jquery.simpleswitch.min.js"></script>
+
+<!-- Light Bootstrap Table Core javascript and methods for Demo purpose -->
+<script src="../assets/js/light-bootstrap-dashboard.js"></script>
+
+
+</html>
